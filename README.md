@@ -1,123 +1,108 @@
 # Windows System Activity Monitor (Educational)
 
 ## Overview
-Windows System Activity Monitor is a C++ project that demonstrates low-level interaction with the Windows operating system. It is designed for educational use in the context of system internals and information security research.
+Windows System Activity Monitor is a C++ project that demonstrates low-level interaction with the Windows operating system.
 
-The project shows how user activity and system data can be collected using native Windows APIs, how such data can be structured, and how typical persistence and anti-analysis techniques are implemented. The intent is to provide a clear, practical example of techniques that are commonly discussed in malware analysis, but from a defensive and research-oriented perspective.
+The code focuses on how user input and system data can be accessed through native Windows APIs, how this data can be structured, and how persistence and basic anti-analysis techniques are implemented.
+
+This is not a production-ready tool — it is a technical demonstration intended for studying system behavior and security-related concepts.
 
 ---
 
 > ⚠️ **WARNING — LEGAL & ETHICAL DISCLAIMER**
 >
 > **This project is created strictly for educational and research purposes.**  
-> Any use of this software to collect data without the explicit consent of the system owner is **illegal** and may lead to legal consequences.  
+> Any use of this software to collect data without the explicit consent of the system owner is **illegal**.  
 >
-> The author **is not responsible** for any direct or indirect damage caused by the use or misuse of this code.  
+> The author **is not responsible** for any damage caused by misuse of this code.  
 >
-> This project demonstrates how software, including potentially malicious programs, can interact with the operating system. The goal is to help developers and security researchers better understand these mechanisms in order to build stronger defenses.
+> The project demonstrates how software can interact with the OS at a low level, including techniques often used in malware, so that developers and security researchers can better understand and defend against them.
 
 ---
 
 ## Technical Overview
 
-### Keyboard Hook (WH_KEYBOARD_LL)
-The project uses the Windows API to install a low-level keyboard hook (`WH_KEYBOARD_LL`). This allows interception of keyboard events globally, outside the context of a single application.
-
-Captured input is processed in real time. The implementation includes handling of virtual key codes, conversion to readable characters, and awareness of the current keyboard layout. It also tracks the active window to provide context for input events.
-
----
-
-### System Information Collection
-Basic system information is collected and serialized into JSON format. This includes:
-- CPU details
-- GPU information
-- Memory (RAM) data
-
-The project uses `nlohmann/json` to structure and serialize this data, making it suitable for logging or transmission.
-
----
-
-### Anti-Analysis Techniques
-The code demonstrates simple anti-analysis behavior:
-- Detection of a debugger using `IsDebuggerPresent`
-- Conditional behavior when analysis is detected
-- Interaction with system utilities such as Task Manager or PowerShell
-
-These mechanisms are included to illustrate how software may attempt to resist inspection, which is relevant for reverse engineering and defensive tooling.
-
----
-
-### Persistence via Registry
-The project includes an example of persistence by adding itself to Windows startup through the registry. This demonstrates how applications can maintain execution across system reboots.
+### Persistence
+The program shows how persistence can be achieved via:
+- Windows Registry (autorun entry)
 
 ---
 
 ### Data Transmission
-Collected data can be sent over the network using the Telegram Bot API. HTTP requests are handled via `libcurl`.
-
-Sensitive strings such as API tokens are not stored in plain form. A simple XOR-based obfuscation is used to reduce direct visibility in the binary. This is not strong encryption, but a demonstration of basic string hiding techniques.
-
+Data can be sent over the network using:
+- Telegram Bot API
+- `libcurl` for HTTP requests
+- 
 ---
 
 ## Functionality
 
-- Intercepts keyboard input with awareness of:
-  - active window
-  - keyboard layout
-- Collects and structures system information
-- Monitors running processes and records activity
-- Produces data dumps for later analysis
-- Uses multiple threads (`std::thread`) to separate:
-  - input capture
-  - data processing
-  - data transmission
+### 1. Low-Level Keyboard Hooking
+Utilizes `SetWindowsHookExW` with `WH_KEYBOARD_LL` for global input interception.
+* **Window Context:** Identifies active window titles via `GetForegroundWindow`.
+* **Localization:** Handles various keyboard layouts using `ToUnicodeEx`.
+* **Thread Safety:** Log writing is synchronized using `std::mutex`.
+
+### 2. System Hardware Diagnostics
+Collects detailed PC configuration data:
+* **CPU:** Architecture and core count via `GetNativeSystemInfo`.
+* **GPU:** Identifies active graphics adapters via `EnumDisplayDevicesA`.
+* **RAM:** Physical memory statistics via `GlobalMemoryStatusEx`.
+
+### 3. Anti-Analysis & Self-Protection
+Demonstrates basic techniques to hinder analysis:
+* **Debugger Detection:** Uses `IsDebuggerPresent` to alter behavior.
+* **Process Protection:** Automatically terminates monitoring tools like `Task Manager`, `PowerShell`, `CMD`, and `Resource Monitor`.
+
+### 4. Persistence Mechanism
+Implements persistence through the Windows Registry:
+* **Entry:** Creates a value in `Software\Microsoft\Windows\CurrentVersion\Run`.
+* **Masking:** Obfuscates as a system service named `RealtekSoundsGood`.
+
+### 5. Exfiltration & Obfuscation
+* **Network:** Transmits collected logs and JSON reports to Telegram via `libcurl`.
+* **Obfuscation:** Uses a custom XOR method to hide API tokens and file paths from static analysis.
 
 ---
 
 ## Dependencies
 
-The project relies on the following:
-
-- [`nlohmann/json`](https://github.com/nlohmann/json) — JSON serialization
-- `libcurl` — HTTP communication
-- Windows SDK — WinAPI access
+- [`nlohmann/json`](https://github.com/nlohmann/json)
+- `libcurl`
+- Windows SDK (WinAPI)
 
 ---
 
-## Build Instructions
+## Building
 
-### Visual Studio
-1. Open the solution file (`.sln`)
-2. Ensure the following are available:
-   - Windows SDK
-   - libcurl (via vcpkg or manual setup)
-3. Select a build configuration (`Debug` or `Release`)
-4. Build the solution
+This repository currently contains **source code only**.
+
+To build the project, you need to:
+1. Create your own project (e.g. in Visual Studio or another compiler)
+2. Add the source file(s) from `src/`
+3. Link required dependencies:
+   - `libcurl`
+   - Windows libraries
+4. Ensure include paths for:
+   - [`nlohmann/json`](https://github.com/nlohmann/json)
+
+No build system (CMake, .sln, etc.) is provided.
 
 ---
 
-### CMake
-```bash
-git clone <repository-url>
-cd project
-mkdir build
-cd build
-cmake ..
-cmake --build .
-```
+## Ethical Note
 
-### Dependies
-If dependencies are missing, install them using a package manager such as vcpkg:
+Understanding how these techniques work is important for security.
 
-```
-vcpkg install curl nlohmann-json
-```
+Mechanisms such as input interception, persistence, and process monitoring are commonly used both in legitimate software and in malware. Studying them helps in:
+- malware analysis
+- detection engineering
+- development of AV/EDR solutions
 
-### Ethical Note
-
-**Understanding how these techniques work is important for security. Many defensive systems—such as antivirus software and endpoint detection and response (EDR)—rely on recognizing patterns like input interception, persistence mechanisms, and unusual process behavior.
-Studying these concepts in a controlled and transparent way helps build better detection and protection tools.**
+---
 
 ## Notes
 
-**This project should be treated as a technical demonstration. It is not intended for real-world deployment or use on systems without full ownership and consent.**
+This project is a **technical demonstration**.
+
+Do not use it on systems without explicit permission.
