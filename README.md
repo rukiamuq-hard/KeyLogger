@@ -1,4 +1,4 @@
-# Windows System Activity Monitor (Educational)
+# Windows System Activity Monitor
 
 ## Overview
 Windows System Activity Monitor is a C++ project that demonstrates low-level interaction with the Windows operating system.
@@ -85,8 +85,6 @@ To build the project, you need to:
    - Windows libraries
 4. Ensure include paths for:
    - [`nlohmann/json`](https://github.com/nlohmann/json)
-
-No build system (CMake, .sln, etc.) is provided.
 
 ---
 
