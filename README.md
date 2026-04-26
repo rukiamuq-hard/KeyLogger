@@ -109,12 +109,14 @@ cmake --build .
 ### Dependies
 If dependencies are missing, install them using a package manager such as vcpkg:
 
+```
 vcpkg install curl nlohmann-json
+```
 
 ### Ethical Note
 
-Understanding how these techniques work is important for security. Many defensive systems—such as antivirus software and endpoint detection and response (EDR)—rely on recognizing patterns like input interception, persistence mechanisms, and unusual process behavior.
-Studying these concepts in a controlled and transparent way helps build better detection and protection tools.
+**Understanding how these techniques work is important for security. Many defensive systems—such as antivirus software and endpoint detection and response (EDR)—rely on recognizing patterns like input interception, persistence mechanisms, and unusual process behavior.
+Studying these concepts in a controlled and transparent way helps build better detection and protection tools.**
 
 ## Notes
 
