@@ -78,7 +78,7 @@ Sensitive strings such as API tokens are not stored in plain form. A simple XOR-
 
 The project relies on the following:
 
-- `[`nlohmann/json`](https://github.com/nlohmann/json)` — JSON serialization
+- [`nlohmann/json`](https://github.com/nlohmann/json) — JSON serialization
 - `libcurl` — HTTP communication
 - Windows SDK — WinAPI access
 
